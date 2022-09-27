@@ -1,7 +1,8 @@
 class CacheContext
 {
-	constructor(value, counter)
+	constructor(key, value, counter)
 	{
+		this.key = key;
 		this.value = value;
 		this.counter = counter;
 	}
@@ -14,46 +15,49 @@ export class Cache
 		this.data = [];
 	}
 	
-	get(key)
+	getLength()
+	{
+		return this.data.length;
+	}
+	
+	add(key, value, counter = 1)
+	{
+		let i = this.data.findIndex(x => x.key == key);
+		
+		if(i >= 0)
+			this.data[i] = {key, value, counter};
+		else
+			this.data.push(new CacheContext(key, value, counter));
+	}
+	
+	getValue(key)
 	{
 		let i = this.data.findIndex(x => x.key == key);
 		
 		if(i < 0)
 			return null;
 		
-		let resultItem = this.data[i];
+		let item = this.data[i];
 		
 		if(--this.data[i].counter == 0)
 			this.data.splice(i, 1);
 		
-		return resultItem;
+		return item.value;
 	}
 
-	add(key, value, counter = 1)
+	isKey(key)
+	{	
+		return (this.data.findIndex(x => x.key == key) >= 0);
+	}
+	
+	getCounter(key)
 	{
 		let i = this.data.findIndex(x => x.key == key);
 		
-		if(i > 0)
-		{
-			this.data[i].key = key;
-			this.data[i].value = value;
-			this.data[i].counter = counter;
-		}
-		else
-		{
-			this.data.push(new CacheContext(key, value, counter));
-		}
-	}
-	
-	getStatistics(key)
-	{
-		return this.data;
-	}
-	
-	test()
-	{
+		if(i < 0)
+			return null;
 		
-		return true;
+		return this.data[i].counter;
 	}
 	
 }
